@@ -1,0 +1,26 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging into Amazon ECR...
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 992757690557.dkr.ecr.us-east-1.amazonaws.com
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+
+  build:
+    commands:
+      - echo Building the Docker image...
+      - docker build -t 992757690557.dkr.ecr.us-east-1.amazonaws.com/miniproject1/braintask:$IMAGE_TAG .
+
+  post_build:
+    commands:
+      - echo Pushing the image to ECR...
+      - docker push 992757690557.dkr.ecr.us-east-1.amazonaws.com/miniproject1/braintask:$IMAGE_TAG
+      - echo Updating kubeconfig for EKS...
+      - aws eks update-kubeconfig --region us-east-1 --name brain-tasks-cluster
+      - echo Updating Kubernetes deployment...
+      - kubectl set image deployment/brain-tasks-deployment brain-tasks=992757690557.dkr.ecr.us-east-1.amazonaws.com/miniproject1/braintask:$IMAGE_TAG || echo "Set image failed. Please verify container and deployment names."
+
+artifacts:
+  files:
+    - '**/*

@@ -1,0 +1,11 @@
+version: 0.0
+Resources:
+  - myApp:
+      Type: Kubernetes
+      Properties:
+        ClusterName: brain-tasks-cluster
+        ServiceRoleArn: arn:aws:iam::992757690557:role/codeDeployECS
+        ResourceType: manifest
+        ManifestFilePaths:
+          - deployment.yaml
+          - service.yaml
