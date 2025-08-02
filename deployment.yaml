@@ -14,6 +14,8 @@ spec:
     spec:
       containers:
         - name: brain-tasks
-          image: 992757690557.dkr.ecr.us-east-1.amazonaws.com/miniproject1/braintask:latest
+          image: public.ecr.aws/s2i0y8i2/brain-task-app:latest
           ports:
             - containerPort: 80
+      imagePullSecrets:
+        - name: ecr-creds
